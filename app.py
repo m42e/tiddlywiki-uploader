@@ -41,7 +41,7 @@ def put_tiddler(filename, mimetype):
 
 def ajax_response(status, msg):
     status_code = "ok" if status else "error"
-    return json.dumps(dict(
+    return jsonify(dict(
         status=status_code,
         msg=msg,
     ))
