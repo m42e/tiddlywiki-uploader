@@ -8,6 +8,9 @@ import uuid
 import requests
 from flask import Flask, jsonify, request, send_from_directory, Response, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
+auth = HTTPBasicAuth()
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -46,10 +49,22 @@ def ajax_response(status, msg):
         msg=msg,
     ))
 
+users = {
+        "matthias": generate_password_hash("dnd5e"),
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users:
+        return check_password_hash(users.get(username), password)
+    return False
+
+@auth.login_required
 @app.route("/")
 def index():
     return render_template("index.html")
 
+@auth.login_required
 @app.route("/", methods=["POST"])
 def upload_image():
     if "file" not in request.files:
