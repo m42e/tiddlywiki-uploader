@@ -55,7 +55,7 @@ def upload_image():
 
     file = request.files["file"]
     filename = file.filename
-    seed = hashlib.sha1(file.read()).digest()
+    #seed = hashlib.sha1(file.read()).digest()
     #random_dir = __get_random_dir(seed=seed)
     #fdir = os.path.join(settings.FILES_DIR, random_dir)
     #os.makedirs(fdir, exist_ok=True)
