@@ -83,6 +83,7 @@ def upload():
         destination = os.path.join('files', filename)
         upload.save(destination)
         names.append(filename)
+        put_tiddler(filename, upload.mimetype)
 
     if is_ajax:
         return ajax_response(True, names)
