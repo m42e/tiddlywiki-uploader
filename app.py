@@ -21,15 +21,6 @@ def __get_random_dir(seed=None):
 
 
 
-@app.route("/", methods=["GET"])
-def root():
-    return """
-<form action="/" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" id="file">
-    <input type="submit" value="Upload" name="submit">
-</form>
-"""
-
 def put_tiddler(filename, mimetype):
     print('info', mimetype)
     uri = 'https://dndwiki.d1v3.de' + '/recipes/default/tiddlers/' + filename
@@ -48,22 +39,54 @@ def put_tiddler(filename, mimetype):
     print(resp.content)
     pass
 
+def ajax_response(status, msg):
+    status_code = "ok" if status else "error"
+    return json.dumps(dict(
+        status=status_code,
+        msg=msg,
+    ))
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 @app.route("/", methods=["POST"])
 def upload_image():
     if "file" not in request.files:
         return jsonify(error="File is missing!"), 400
 
-    file = request.files["file"]
-    filename = file.filename
-    #seed = hashlib.sha1(file.read()).digest()
-    #random_dir = __get_random_dir(seed=seed)
-    #fdir = os.path.join(settings.FILES_DIR, random_dir)
-    #os.makedirs(fdir, exist_ok=True)
-    filepath = os.path.join('./files', filename)
-    file.save(filepath)
-    put_tiddler(filename, file.mimetype)
+    for upload in request.files.getlist("file"):
+        filename = upload.filename.rsplit("/")[0]
+        filepath = os.path.join('./files', filename)
+        file.save(filepath)
+        put_tiddler(filename, file.mimetype)
+        if is_ajax:
+            return ajax_response(True, filepath)
+        else:
+            return jsonify(filename=f'{filepath}')
 
-    return jsonify(filename=f'{filepath}')
+
+@app.route("/upload", methods=["POST"])
+def upload():
+    """Handle the upload of a file."""
+    form = request.form
+
+    # Is the upload using Ajax, or a direct POST by the form?
+    is_ajax = False
+    if form.get("__ajax", None) == "true":
+        is_ajax = True
+
+    for upload in request.files.getlist("file"):
+        filename = upload.filename.rsplit("/")[0]
+        destination = "/".join([target, filename])
+        upload.save(destination)
+
+    if is_ajax:
+        return ajax_response(True, upload_key)
+    else:
+        return redirect(url_for("upload_complete", uuid=upload_key)),
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, threaded=True)
