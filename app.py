@@ -59,29 +59,13 @@ def verify_password(username, password):
         return check_password_hash(users.get(username), password)
     return False
 
-@auth.login_required
 @app.route("/")
+@auth.login_required
 def index():
     return render_template("index.html")
 
-@auth.login_required
 @app.route("/", methods=["POST"])
-def upload_image():
-    if "file" not in request.files:
-        return jsonify(error="File is missing!"), 400
-
-    for upload in request.files.getlist("file"):
-        filename = upload.filename.rsplit("/")[0]
-        filepath = os.path.join('./files', filename)
-        file.save(filepath)
-        put_tiddler(filename, file.mimetype)
-        if is_ajax:
-            return ajax_response(True, filepath)
-        else:
-            return jsonify(filename=f'{filepath}')
-
-
-@app.route("/upload", methods=["POST"])
+@auth.login_required
 def upload():
     """Handle the upload of a file."""
     form = request.form
