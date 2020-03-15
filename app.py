@@ -76,15 +76,18 @@ def upload():
     if form.get("__ajax", None) == "true":
         is_ajax = True
 
+    names = []
+
     for upload in request.files.getlist("file"):
         filename = upload.filename.rsplit("/")[0]
-        destination = "/".join([target, filename])
+        destination = os.path.join('files', filename)
         upload.save(destination)
+        names.append(filename)
 
     if is_ajax:
-        return ajax_response(True, upload_key)
+        return ajax_response(True, names)
     else:
-        return redirect(url_for("upload_complete", uuid=upload_key)),
+        return redirect(url_for("index")),
 
 
 
