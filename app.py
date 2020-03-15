@@ -5,7 +5,6 @@ import random
 import string
 import uuid
 
-import settings
 import requests
 from flask import Flask, jsonify, request, send_from_directory, Response
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -16,11 +15,9 @@ app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 
 
 def __get_random_dir(seed=None):
-    if settings.NAME_STRATEGY == 'randomstr':
-        if seed is not None:
-            random.seed(seed)
-        return "".join(random.choices(string.ascii_lowercase + string.digits + string.ascii_uppercase, k=8))
-    return str(uuid.uuid4())
+    if seed is not None:
+        random.seed(seed)
+    return "".join(random.choices(string.ascii_lowercase + string.digits + string.ascii_uppercase, k=8))
 
 
 
@@ -52,15 +49,6 @@ def put_tiddler(filename, mimetype):
     pass
 
 @app.route("/", methods=["POST"])
-@limiter.limit(
-    "".join(
-        [
-            f"{settings.MAX_UPLOADS_PER_DAY}/day;",
-            f"{settings.MAX_UPLOADS_PER_HOUR}/hour;",
-            f"{settings.MAX_UPLOADS_PER_MINUTE}/minute",
-        ]
-    )
-)
 def upload_image():
     if "file" not in request.files:
         return jsonify(error="File is missing!"), 400
@@ -71,7 +59,7 @@ def upload_image():
     #random_dir = __get_random_dir(seed=seed)
     #fdir = os.path.join(settings.FILES_DIR, random_dir)
     #os.makedirs(fdir, exist_ok=True)
-    filepath = os.path.join(settings.FILES_DIR, filename)
+    filepath = os.path.join('./files', filename)
     if not os.path.isfile(filepath):
         file.save(filepath)
         put_tiddler(filename, file.mimetype)
