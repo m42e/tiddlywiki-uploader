@@ -6,7 +6,7 @@ import string
 import uuid
 
 import requests
-from flask import Flask, jsonify, request, send_from_directory, Response
+from flask import Flask, jsonify, request, send_from_directory, Response, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
