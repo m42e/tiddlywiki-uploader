@@ -60,11 +60,10 @@ def upload_image():
     #fdir = os.path.join(settings.FILES_DIR, random_dir)
     #os.makedirs(fdir, exist_ok=True)
     filepath = os.path.join('./files', filename)
-    if not os.path.isfile(filepath):
-        file.save(filepath)
-        put_tiddler(filename, file.mimetype)
+    file.save(filepath)
+    put_tiddler(filename, file.mimetype)
 
-    return jsonify(filename=f'./files/{filename}')
+    return jsonify(filename=f'{filepath}')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, threaded=True)
