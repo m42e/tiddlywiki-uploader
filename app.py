@@ -12,10 +12,11 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
+app.config['APPLICATION_ROOT'] = os.getenv('TW_UPLOAD_PATH', '')
 
 
 def put_tiddler(filename, mimetype, username):
-    uri = 'https://' + os.env.get('TW_URL', 'dndwiki.d1v3.de') + '/recipes/default/tiddlers/' + filename
+    uri = 'https://' + os.getenv('TW_URL', 'dndwiki.d1v3.de') + '/recipes/default/tiddlers/' + filename
     if 'image' in mimetype:
         tags = "image [[external image]]"
     else:
