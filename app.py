@@ -38,6 +38,7 @@ def put_tiddler(filename, mimetype, username):
             },
     }
     resp = requests.put(uri, json=data, headers={'X-Requested-With': 'TiddlyWiki'})
+    print(resp.content)
     pass
 
 def ajax_response(status, msg):
