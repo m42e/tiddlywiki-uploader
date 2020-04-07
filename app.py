@@ -21,7 +21,7 @@ def no_app(environ, start_response):
 
 app.wsgi_app = DispatcherMiddleware(no_app, {os.getenv('TW_UPLOAD_PATH', ''): app.wsgi_app})
 
-def put_tiddler(filename, mimetype, username):
+def put_tiddler(filename, mimetype, username, authinfo=None):
     uri = 'https://' + os.getenv('TW_URL', 'dndwiki.d1v3.de') + '/recipes/default/tiddlers/' + filename
     if 'image' in mimetype:
         tags = "image [[external image]]"
@@ -37,7 +37,7 @@ def put_tiddler(filename, mimetype, username):
               "_canonical_uri": f"./files/{filename}",
             },
     }
-    resp = requests.put(uri, json=data, headers={'X-Requested-With': 'TiddlyWiki'})
+    resp = requests.put(uri, json=data, headers={'X-Requested-With': 'TiddlyWiki', 'Authorization': authinfo})
     print(resp.content)
     pass
 
@@ -69,7 +69,7 @@ def upload():
         destination = os.path.join('files', filename)
         upload.save(destination)
         names.append(filename)
-        put_tiddler(filename, upload.mimetype, request.headers.get('x-forward-user', 'none'))
+        put_tiddler(filename, upload.mimetype, request.headers.get('x-forward-user', 'none'), request.headers.get('authorization'))
 
     if is_ajax:
         return ajax_response(True, names)
