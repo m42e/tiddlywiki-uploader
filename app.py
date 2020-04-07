@@ -8,38 +8,29 @@ import uuid
 import requests
 from flask import Flask, jsonify, request, send_from_directory, Response, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_httpauth import HTTPBasicAuth
-from werkzeug.security import generate_password_hash, check_password_hash
-auth = HTTPBasicAuth()
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 
 
-def __get_random_dir(seed=None):
-    if seed is not None:
-        random.seed(seed)
-    return "".join(random.choices(string.ascii_lowercase + string.digits + string.ascii_uppercase, k=8))
-
-
-
-def put_tiddler(filename, mimetype):
-    print('info', mimetype)
-    uri = 'https://dndwiki.d1v3.de' + '/recipes/default/tiddlers/' + filename
+def put_tiddler(filename, mimetype, username):
+    uri = 'https://' + os.env.get('TW_URL', 'dndwiki.d1v3.de') + '/recipes/default/tiddlers/' + filename
+    if 'image' in mimetype:
+        tags = "image [[external image]]"
+    else:
+        tags = "file [[external file]]"
     data = {
-      "creator": "matthias",
+      "creator": username,
       "text": "",
       "title": filename,
-      "tags": "image [[external image]]",
+      "tags": tags,
       "type": mimetype,
       "fields": {
               "_canonical_uri": f"./files/{filename}",
             },
     }
-    resp = requests.put(uri, json=data, auth=('matthias', 'dnd5e'), headers={'X-Requested-With': 'TiddlyWiki'})
-    print(resp)
-    print(resp.content)
+    resp = requests.put(uri, json=data, headers={'X-Requested-With': 'TiddlyWiki'})
     pass
 
 def ajax_response(status, msg):
@@ -49,23 +40,11 @@ def ajax_response(status, msg):
         msg=msg,
     ))
 
-users = {
-        "matthias": generate_password_hash("dnd5e"),
-}
-
-@auth.verify_password
-def verify_password(username, password):
-    if username in users:
-        return check_password_hash(users.get(username), password)
-    return False
-
 @app.route("/")
-@auth.login_required
 def index():
     return render_template("index.html")
 
 @app.route("/", methods=["POST"])
-@auth.login_required
 def upload():
     """Handle the upload of a file."""
     form = request.form
@@ -82,7 +61,7 @@ def upload():
         destination = os.path.join('files', filename)
         upload.save(destination)
         names.append(filename)
-        put_tiddler(filename, upload.mimetype)
+        put_tiddler(filename, upload.mimetype, request.headers.get('x-forward-user', 'none'))
 
     if is_ajax:
         return ajax_response(True, names)
