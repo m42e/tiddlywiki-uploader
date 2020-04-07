@@ -12,7 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
-app.config['APPLICATION_ROOT'] = os.getenv('TW_UPLOAD_PATH', '')
+APP_PREFIX = os.getenv('TW_UPLOAD_PATH', '')
 
 
 def put_tiddler(filename, mimetype, username):
@@ -41,11 +41,11 @@ def ajax_response(status, msg):
         msg=msg,
     ))
 
-@app.route("/")
+@app.route(f"{APP_PREFIX}/")
 def index():
     return render_template("index.html")
 
-@app.route("/", methods=["POST"])
+@app.route(f"{APP_PREFIX}/", methods=["POST"])
 def upload():
     """Handle the upload of a file."""
     form = request.form
