@@ -88,6 +88,9 @@ function doUpload() {
             else {
                 // Ok! Get the UUID.
                 $("#progress").hide();
+                PENDING_FILES.splice(0,PENDING_FILES.length)
+                var $dropbox = $("#dropbox");
+                $dropbox.text(PENDING_FILES.length + " files ready for upload!");
 
                 // Gray out the form.
                 $("#upload-form :input").removeAttr("disabled");
