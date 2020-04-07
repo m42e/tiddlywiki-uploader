@@ -90,7 +90,7 @@ function doUpload() {
                 $("#progress").hide();
                 PENDING_FILES.splice(0,PENDING_FILES.length)
                 var $dropbox = $("#dropbox");
-                $dropbox.text(PENDING_FILES.length + " files ready for upload!");
+                $dropbox.text("Drag and Drop Files Here");
 
                 // Gray out the form.
                 $("#upload-form :input").removeAttr("disabled");
@@ -168,7 +168,7 @@ function initDropbox() {
         handleFiles(files);
 
         // Update the display to acknowledge the number of pending files.
-        $dropbox.text(PENDING_FILES.length + " files ready for upload!");
+        $dropbox.text(PENDING_FILES.length + " files ready!");
     });
 
     // If the files are dropped outside of the drop zone, the browser will
