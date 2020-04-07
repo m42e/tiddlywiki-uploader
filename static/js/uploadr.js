@@ -77,7 +77,6 @@ function doUpload() {
         data: fd,
         success: function(data) {
             $progressBar.css({"width": "100%"});
-            data = JSON.parse(data);
 
             // How'd it go?
             if (data.status === "error") {
