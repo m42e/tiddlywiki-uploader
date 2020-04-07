@@ -43,7 +43,7 @@ def ajax_response(status, msg):
 
 @app.route(f"{APP_PREFIX}/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", prefix=APP_PREFIX)
 
 @app.route(f"{APP_PREFIX}/", methods=["POST"])
 def upload():
