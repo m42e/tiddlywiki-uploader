@@ -2,9 +2,6 @@
  * HTML5 Multiple File Uploader Demo                                          *
  ******************************************************************************/
 
-// Constants
-var UPLOAD_URL = "/upload";
-
 // List of pending files to handle when the Upload button is finally clicked.
 var PENDING_FILES  = [];
 
@@ -31,6 +28,7 @@ $(document).ready(function() {
 
 
 function doUpload() {
+    var UPLOAD_URL = $("#upload-form").attr('action');
     $("#progress").show();
     var $progressBar   = $("#progress-bar");
 
@@ -90,6 +88,10 @@ function doUpload() {
             }
             else {
                 // Ok! Get the UUID.
+                $("#progress").hide();
+
+                // Gray out the form.
+                $("#upload-form :input").removeAttr("disabled");
             }
         },
     });
