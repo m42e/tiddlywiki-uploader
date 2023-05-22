@@ -1,5 +1,5 @@
 Flask==1.1.1
 Werkzeug==2.2.3
 gunicorn==19.9.0
-requests==2.23.0
+requests==2.31.0
 flask-httpauth==3.3.0
